@@ -762,6 +762,18 @@ describe('asChoiceField', () => {
   it('replaces value with checked', () => {
     expect(asChoiceField({value: true} as any)).toMatchObject({checked: true});
   });
+
+  it('projects a checked value from a predicate', () => {
+    expect(asChoiceField<'A' | 'B'>({value: 'A'} as any, 'A')).toMatchObject({
+      checked: true,
+    });
+  });
+
+  it('projects an unchecked value from a predicate', () => {
+    expect(asChoiceField<'A' | 'B'>({value: 'B'} as any, 'A')).toMatchObject({
+      checked: false,
+    });
+  });
 });
 
 describe('useChoiceField', () => {
