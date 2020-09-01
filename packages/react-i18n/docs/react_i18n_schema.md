@@ -184,7 +184,7 @@ React I18n does not support the use of comments when serialized to JSON. This is
 JSON < JSON+Comments < JSON5
 ```
 
-Historically, `JSON` had support for comments, but this [was then removed](https://web.archive.org/web/20120507093915/https://plus.google.com/118095276221607585885/posts/RK8qyGVaGSr). However, comments have proven to be a useful mechanism for developers to [provide additional context to translators](https://development.shopify.io/engineering/developing_at_Shopify/internationalization/providing_context_notes). The `JSON+Comments` serialization format extends the `JSON` serialization to re-add support for comments.
+Historically, `JSON` had support for comments, but this [was then removed](https://archive.vn/20150704102718/https://plus.google.com/+DouglasCrockfordEsq/posts/RK8qyGVaGSr). However, comments have proven to be a useful mechanism for developers to [provide additional context to translators](https://development.shopify.io/engineering/developing_at_Shopify/internationalization/providing_context_notes). The `JSON+Comments` serialization format extends the `JSON` serialization to re-add support for comments.
 
 The `JSON+Comments` can be parsed using a `JSON5` parser, or a `JSON` parser that is not sensitive to comments.
 
