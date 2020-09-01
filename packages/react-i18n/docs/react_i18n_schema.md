@@ -2,8 +2,6 @@
 
 React I18n is a schema comprised of a structure of nested key-value pairs (KVPs). This document captures the nuances of the constraints placed on the schema by the different levels of concern.
 
-**Note:** Throughout this document, the examples will be shown using the [JSON5](https://json5.org/) serialization, but other serializations are possible. See the [Serialization](#serialization) section for nuances related to the various serialization formats.
-
 <!-- Created using "Markdown All in One" extension for VS Code -->
 - [History](#history)
   - [Version 1.0](#version-10)
@@ -14,9 +12,10 @@ React I18n is a schema comprised of a structure of nested key-value pairs (KVPs)
   - [Invalid pluralization keys](#invalid-pluralization-keys)
   - [Detecting pluralization contexts](#detecting-pluralization-contexts)
 - [Serialization](#serialization)
-  - [Serialization to JSON5](#serialization-to-json5)
   - [Serialization to JSON](#serialization-to-json)
     - [Comments](#comments)
+  - [Serialization to JSON+Comments](#serialization-to-jsoncomments)
+    - [Why not JSON5?](#why-not-json5)
 - [Comparison with Rails I18n](#comparison-with-rails-i18n)
     - [Root locale key](#root-locale-key)
     - [Pluralization](#pluralization-1)
@@ -51,7 +50,7 @@ export interface TranslationDictionary {
 }
 ```
 
-When serialized to JSON, each of the dictionaries become JSON `object` types, and the keys and leaf values are both JSON `string` types.
+When [serialized to JSON]](#serialization-to-json), each of the dictionaries become JSON `object` types, and the keys and leaf values are both JSON `string` types.
 
 **Example React I18n JSON file**
 
@@ -146,37 +145,11 @@ Any additional children within the context are invalid.
 
 # Serialization
 
-React I18n can be serialized to different formats. However, not all serialization formats are created equal.
+React I18n can be serialized to different formats. However, not all serialization formats are created equal. Two serializations are officialy defined.
 
-| Serialization Format | JSON5 | JSON |
-| -------------------- | ----- | ---- |
-| Comments             | ✅     | ❌    |
-
-## Serialization to JSON5
-
-When serialized to [JSON5](https://json5.org/), each of the dictionaries become JSON5 `object` types, and the keys and leaf values are both JSON5 `string` types.
-
-**Note:** A very nice advantage that JSON5 offers over JSON is the ability to include comments. Some tools (like the Translation Platform) are able to present these comments to translators as a means of [providing additional context](https://development.shopify.io/engineering/developing_at_Shopify/internationalization/providing_context_notes) during the translation process. Therefore, the use of JSON5 is prefered over JSON whenever feasible.
-
-**Example React I18n JSON5 file**
-
-```json5
-{
-  // This is a context comment!
-  "hello": "My name is {name}",
-  "parent": {
-    "child_1": "I am the first child of `parent`!",
-    "child_2": {
-      /*
-        This is a multi-line
-        context comment!
-      */
-      "grandchild_1": "I am the first grandchild of `parent`!",
-      "grandchild_2": "I am the second grandchild of `parent`!", // Note the trailing comma. Yay JSON5!
-    }
-  }
-}
-```
+| Serialization Format | JSON+Comments | JSON |
+| -------------------- | ------------- | ---- |
+| Comments             | ✅             | ❌    |
 
 ## Serialization to JSON
 
@@ -200,6 +173,47 @@ When serialized to [JSON](https://www.json.org/json-en.html), each of the dictio
 ### Comments
 
 React I18n does not support the use of comments when serialized to JSON. This is due to JSON's lack of support for comments.
+
+## Serialization to JSON+Comments
+
+`JSON+Comments` is a serialization format whose syntax is a superset of `JSON`, but a subset of [`JSON5`](https://json5.org/).
+
+```
+JSON < JSON+Comments < JSON5
+```
+
+Historically, `JSON` had support for comments, but this [was then removed](https://web.archive.org/web/20120507093915/https://plus.google.com/118095276221607585885/posts/RK8qyGVaGSr). However, comments have proven to be a useful mechanism for developers to [provide additional context to translators](https://development.shopify.io/engineering/developing_at_Shopify/internationalization/providing_context_notes). The `JSON+Comments` serialization format extends the `JSON` serialization to re-add support for comments.
+
+The `JSON+Comments` can be parsed using a `JSON5` parser, or a `JSON` parser that is not sensitive to comments.
+
+**Example React I18n JSON5 file**
+
+```json5
+{
+  // This is a context comment for `hello`!
+  "hello": "My name is {name}",
+  "parent": {
+    "child_1": "I am the first child of `parent`!", // This is a trailing context comment for `child_1`!
+    "child_2": {
+      /*
+        This is a multi-line
+        context comment for `grandchild_1`!
+      */
+      "grandchild_1": "I am the first grandchild of `parent`!",
+      "grandchild_2": "I am the second grandchild of `parent`!"
+    }
+  }
+}
+```
+
+### Why not JSON5?
+
+Ideally, we would not have needed a `JSON+Comments` serialization, and instead just defined a [`JSON5`](https://json5.org/) serialization instead.
+However, `JSON5` parsers are immature, and notably there are no mature `JSON5` parsers in Ruby. Given that important consumers of React I18n files are written in Ruby, it would not make sense to define a serialization using the full syntax of `JSON5`, since those files would not be able to be handled.
+
+Adding a `JSON5` serialization would be an excellent future addition to React I18n, at a point in time where these consumers could be made to understand `JSON5`.
+
+Since `JSON+Comments` is a subset of `JSON5`, a `JSON5` parser can be used to parse `JSON+Comments` serialized files.
 
 # Comparison with Rails I18n
 
@@ -260,7 +274,7 @@ en:
 
 ### Interpolation
 
-While neither schemas define a interpolation syntax, the most common syntax used in Rails I18n is `%{}`, while in React I18n, the most common syntax is `{}`.
+While neither schemas define an interpolation syntax, the most common syntax used in Rails I18n is `%{}`, while in React I18n, the most common syntax is `{}`.
 
 **Rails I18n:**
 ```yaml
