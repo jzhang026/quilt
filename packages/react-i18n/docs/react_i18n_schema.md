@@ -188,7 +188,7 @@ Historically, `JSON` had support for comments, but this [was then removed](https
 
 The `JSON+Comments` can be parsed using a `JSON5` parser, or a `JSON` parser that is not sensitive to comments.
 
-**Example React I18n JSON5 file**
+**Example React I18n JSON+Commments file**
 
 ```json5
 {
