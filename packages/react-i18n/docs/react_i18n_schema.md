@@ -145,7 +145,9 @@ Any additional children within the context are invalid.
 
 # Serialization
 
-React I18n can be serialized to different formats. However, not all serialization formats are created equal. Two serializations are officialy defined.
+React I18n can be serialized to different formats. However, not all serialization formats are created equal.
+
+Two serializations are officialy defined. Consumers of React I18n files are expected to be able to parse files serialized into each of these serialization formats.
 
 | Serialization Format | JSON+Comments | JSON |
 | -------------------- | ------------- | ---- |
